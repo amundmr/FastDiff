@@ -1,5 +1,5 @@
 # FastDiff
-FastDiff(ractogram) is a small software toolkit for easy visualization and lightweight analysis of diffractograms.
+FastDiff(ractogram) is a small software toolkit for easy visualization and lightweight analysis of diffractograms. It has been made for X-Ray diffractograms, but can ofcourse also be used for diffractograms from other radiation types like neutrons.
 
 Current features:
 
