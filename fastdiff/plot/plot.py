@@ -1,12 +1,17 @@
 """Plot contains all plotting features needed"""
-
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from datetime import date
 from math import sqrt
+import plot.utils as utils
+import materials
+import log
+
+logger = log.setup_custom_logger(__name__)
 
 
-def plot_xrd(files, **kwargs):
+def plot(diffObjects, **kwargs):
     fig = plt.figure(figsize=(10,5)) #, tight_layout=True
     fig.suptitle(str(date.today()))
 
@@ -35,9 +40,9 @@ def plot_xrd(files, **kwargs):
         mats = []
         for mat in kwargs['ticks']: #loop materials in the ticks thing
             if "Fd3m" in mat:
-                mats.append(utils.LMNOFd3m)
+                mats.append(materials.LMNOFd3m)
             elif "SRM" in mat or "Si" in mat:
-                mats.append(utils.SRM640d)
+                mats.append(materials.SRM640d)
         for mat in mats:
             for i in range(len(mat.two_thetas)):
                 if i == 0:
@@ -51,9 +56,9 @@ def plot_xrd(files, **kwargs):
 
     for ax in axs:
         ax.tick_params(direction='in', top = 'true', right = 'true')
-        for f in files:
-            labelname = f[4:].strip("_exported.xy")
-            dat = read_xrd(f)
+        for diffObj in diffObjects:
+            labelname = diffObj.name
+            dat = diffObj.xye_t
 
             if 'd_spacing' in kwargs:
                 if kwargs['d_spacing'] == True:
@@ -108,5 +113,5 @@ if __name__ == "__main__":
     xlim = (15, 70)
     ticks = ['SRM', 'Fd3m']
     d_spacing = True
-#
-    plot_xrd(files, xlim = xlim, ticks = ticks, zoom = zoom)
+
+    plot(files, xlim = xlim, ticks = ticks, zoom = zoom)

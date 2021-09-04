@@ -20,7 +20,21 @@ class args():
         parser.add_argument(
             "-p", 
             "--plot", 
+            type = str,
+            nargs = '?',
             help="Plot data with matplotlib",
+            const=True
+            )
+
+        parser.add_argument(
+            "--initplot", 
+            help="Calculates the experiment temperature from an internal platina standard",
+            action="store_true"
+            )
+
+        parser.add_argument(
+            "--calctemp", 
+            help="Calculates the experiment temperature from an internal platina standard",
             action="store_true"
             )
 
@@ -45,6 +59,23 @@ class args():
             settings.LOGLEVEL = logging.INFO
         else:
             settings.LOGLEVEL = logging.WARNING
+
+        if self.args.initplot:
+            import toml
+
+            kwargs = {
+                "files" : [   
+                    "relative/path/to/file.xy",
+                    "relative/path/to/another-file.xy",],
+                "zoom" : [(18.0,19.5), (35.0,40.0)],
+                "xlim" : (15, 70),
+                "ticks" : ['SRM', 'Fd3m'],
+                "d_spacing" : True,
+            }
+
+            with open('plotconfig.toml', 'w') as f:
+                text = toml.dump(kwargs, f)
+
 
     def __repr__(self):
         return self.args

@@ -130,3 +130,6 @@ dmypy.json
 
 # Dev data
 dev_data/
+
+# User config file
+plotconfig.toml
