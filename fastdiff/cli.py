@@ -1,6 +1,9 @@
 """Handles the command line interface of fastdiff"""
 
 import argparse
+import logging
+import settings #local
+
 
 class args():
     """Keeps all our cli arguments"""
@@ -35,6 +38,13 @@ class args():
             )
 
         self.args = parser.parse_args()
+
+        if self.args.debug:
+            settings.LOGLEVEL = logging.DEBUG
+        elif self.args.verbose:
+            settings.LOGLEVEL = logging.INFO
+        else:
+            settings.LOGLEVEL = logging.WARNING
 
     def __repr__(self):
         return self.args
