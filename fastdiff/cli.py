@@ -59,24 +59,3 @@ elif args.verbose:
 else:
     LOG.set_level("SUCCESS")
 
-
-if args.init:
-
-    LOG.debug("Initializing workfolder")
-    import toml
-    import os
-
-    # Make user folders
-    os.mkdir("./CIF")
-    os.mkdir("./data")
-
-    # Make config templates
-    kwargs = {
-        "zoom" : [(18.0,19.5), (35.0,40.0)],
-        "xlim" : (15, 70),
-        "ticks" : ['SRM', 'Fd3m'],
-        "d_spacing" : True,
-    }
-
-    with open('plot.toml', 'w') as f:
-        toml.dump(kwargs, f)

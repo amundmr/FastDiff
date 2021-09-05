@@ -1,4 +1,0 @@
-zoom = [ [ 18.0, 19.5,], [ 35.0, 40.0,],]
-xlim = [ 15, 70,]
-ticks = [ "SRM", "Fd3m",]
-d_spacing = true

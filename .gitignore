@@ -131,5 +131,8 @@ dmypy.json
 # Dev data
 dev_data/
 
-# User config file
-plotconfig.toml
+# User config files
+plot.toml
+
+# User workdir for testing
+workdir/

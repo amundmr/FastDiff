@@ -87,8 +87,41 @@ class Mainclass():
 def help(_):
     print("You can't get help yet")
 
-def init(_):
-    print("Initializing")
+def init(args):
+    import toml
+    import os
+
+    if not args:
+        LOG.error("You MUST choose a working directory by typing 'fastdiff init <dirname>'.")
+        sys.exit()
+    elif os.path.isdir(args[0]):
+        LOG.info("Folder {} already exist".format(args[0]))
+        sys.exit()
+    else:
+        try:
+            os.mkdir(args[0])
+        except:
+            LOG.error("Could not create new working directory {}".format(args[0]))
+            sys.exit()
+
+    LOG.debug("Initializing new work environment")
+
+    
+
+    # Make user folders
+    os.mkdir(os.path.join(args[0], "CIF"))
+    os.mkdir(os.path.join(args[0], "data"))
+
+    # Make config templates
+    kwargs = {
+        "zoom" : [(18.0,19.5), (35.0,40.0)],
+        "xlim" : (15, 70),
+        "ticks" : ['SRM', 'Fd3m'],
+        "d_spacing" : True,
+    }
+
+    with open('plot.toml', 'w') as f:
+        toml.dump(kwargs, f)
 
 def run(_):
     print("running masterpiece")
@@ -114,7 +147,7 @@ command_lookup = {
 
 def main():
     args = sys.argv
-    command_args = []
+    command_args = None
     if len(args) == 1:
         help()
         sys.exit()
