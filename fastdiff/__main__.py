@@ -1,36 +1,29 @@
 """Main"""
 
-import log
+from log import LOG
+
 import sys
 import os
 import pandas as pd
 
-import cli #local module
-import settings #local
+#from cli import args
+#import settings #local
 
 # Initialize global settings
-settings.init() 
+#settings.init() 
 
-# Capture input arguments
-args = cli.args().args
-
-# Initialize logger
-logger = log.setup_custom_logger('root')
-logger.debug('Message from main')
 
 # Importing submodules
-import diff.diff as diff
-import materials.materials as materials
-import plot.plot as plot
+#import diff.diff as diff
+#import materials.materials as materials
+#import plot.plot as plot
 
-
-
-class Main():
+class Mainclass():
     """Main class"""
 
     def __init__(self, args):
         """Initialize main class"""
-
+        LOG.debug("Initializing Main object")
         self.args = args
 
 
@@ -73,7 +66,7 @@ class Main():
                 self.diffs.append(diff.diff(os.path.join(path,file)))
             
         #Tell the user about the files found
-        logger.info("the scan_path() command found the following files in the specified folder: {}".format(filenames))
+        LOG.info("the scan_path() command found the following files in the specified folder: {}".format(filenames))
         
 
     def calc_temps(self):
@@ -91,8 +84,58 @@ class Main():
 
         print(self.df_temp)
 
+def help(_):
+    print("You can't get help yet")
+
+def init(_):
+    print("Initializing")
+
+def run(_):
+    print("running masterpiece")
+
+def version(_):
+    print("version")
+
+def check_dependencies(_):
+    print("Checking dependencies")
+
+
+command_lookup = {
+    "run": run,
+    "init": init,
+    "help": help,
+    "-h": help,
+    "--help": help,
+    "-v": version,
+    "--version": version,
+    "--check-dependencies": check_dependencies
+}
+
+
+def main():
+    args = sys.argv
+    command_args = []
+    if len(args) == 1:
+        help()
+        sys.exit()
+    elif len(args) == 2:
+        command = args[1]
+    else:
+        command = args[1]
+        command_args = args[2:]
+
+    try:
+        try:
+            command_lookup[command](command_args)
+        except KeyboardInterrupt:
+            print(); sys.exit()
+    except KeyError:
+        LOG.error(f"Unknown command \"{command}\"")
 
 
 
 if __name__ == "__main__":
-    Main(args)
+    #Main(args)
+    main()
+
+    

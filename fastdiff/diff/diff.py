@@ -1,14 +1,13 @@
 """The diff module contains everything on single diffractograms."""
-from logging import exception
+
 import os
-import log
+from log import LOG
 import numpy as np
 import pandas as pd
 import scipy
 import sys
 import settings
 
-logger = log.setup_custom_logger(__name__)
 
 ## Definition of peak intervals with Miller indices
 PEAK_INTERVALS = [  (15.5, 16, (1,1,1)),     # 111 plane distance peak
@@ -32,7 +31,7 @@ class diff():
 
     def __init__(self, filename):
         
-        logger.debug('Initializing diff object {}'.format(filename))
+        LOG.debug('Initializing diff object {}'.format(filename))
 
         self.name = os.path.basename(filename)
         self.wavelength = settings.WAVELENGTH # TODO replace this with reader for capturing this data
@@ -46,7 +45,7 @@ class diff():
             self._create_arrays()
 
         except Exception as e:
-            logger.exception("Error occurred while opening the file {}".format(filename))
+            LOG.exception("Error occurred while opening the file {}".format(filename))
 
 
     def _create_arrays(self):
@@ -96,7 +95,7 @@ class diff():
             fn = self.name.split("_t")[-1]
             bl_temp = int(fn[:3])
         except Exception as e:
-            logger.debug("The file {} did not have a recognizable temperature in its filename.".format(self.name))
+            LOG.debug("The file {} did not have a recognizable temperature in its filename.".format(self.name))
             bl_temp = 0
 
         a_lst = []
@@ -127,7 +126,7 @@ class diff():
             a_curve = lattice_const(d_curve, peak[2])
             a_curve_lst.append(a_curve)
             #peak_info.append(peak[2], twotheta, d, a)
-            #logger.debug("{} Peak Max found on 2Theta {:.4f}. d-spacing: {:.4f} Å, lattice param: {:.4f} Å".format(peak[2], twotheta, d, a))
+            #LOG.debug("{} Peak Max found on 2Theta {:.4f}. d-spacing: {:.4f} Å, lattice param: {:.4f} Å".format(peak[2], twotheta, d, a))
 
         avg_a = sum(a_lst)/len(a_lst)
         std_a = np.std(a_lst)

@@ -5,11 +5,8 @@ import matplotlib.gridspec as gridspec
 from datetime import date
 from math import sqrt
 import plot.utils as utils
-import materials
-import log
-
-logger = log.setup_custom_logger(__name__)
-
+import materials.materials as materials
+from log import LOG
 
 def plot(diffObjects, **kwargs):
     fig = plt.figure(figsize=(10,5)) #, tight_layout=True
@@ -80,7 +77,7 @@ def plot(diffObjects, **kwargs):
 
 
     axs[0].legend()
-
+    LOG.debug("Showing plot")
     plt.show()
 
 def twotheta2d(tth):
