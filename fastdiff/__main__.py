@@ -1,121 +1,51 @@
 """Main, this is ran when the user calls fastdiff."""
 
-from typing import Any
+
 from log import LOG
 
-import sys
-import os
-import toml
-import shutil
-import pandas as pd
 
-#from cli import args
-#import settings #local
+def help(*args):
+    help_string = """
+    Commands:
+        run <folder>    Runs fastdiff with the configuration in the specified folder.
+        init <folder>   Initializes working directory in the specified folder
+        help, -h        Shows this help screen
+        -v, --version   Shows the version number
+        --check-deps    Checks to see if all dependencies are correctly installed."""
+    LOG.info(help_string)
 
-# Initialize global settings
-#settings.init() 
-
-
-class Mainclass():
-    """Main class"""
-
-    def __init__(self, args):
-        """Initialize main class"""
-        LOG.debug("Initializing Main object")
-        self.args = args
-
-
-        # Initialize list of diff objects
-        self.diffs = []
-
-
-        # Act on input arguments
-        if os.path.isdir(self.args.path):
-            self.scan_path(self.args.path)
-        elif os.path.isfile(self.args.path):
-            self.diffs.append(diff.diff(self.args.path))
-
-
-        if type(self.args.plot) is str:
-            import toml
-            with open(self.args.plot) as f:
-                self.plotkwargs = toml.load(f, _dict=dict)
-
-            plot.plot(self.diffs, **self.plotkwargs)
-        elif self.args.plot:
-            plot.plot(self.diffs)
-
-        if self.args.calctemp:
-            self.calc_temps()
-
-
-    def scan_path(self, path):
-        """Scans the path inserted for supported filetypes and returns as list"""
-
-        dir_files = []
-        for (dirpath, dirnames, filenames) in os.walk(path):
-            dir_files.extend(filenames)
-            
-
-        filenames = []
-        for file in dir_files:
-            if file.split(".")[-1] == "xye":
-                filenames.append(file)
-                self.diffs.append(diff.diff(os.path.join(path,file)))
-            
-        #Tell the user about the files found
-        LOG.info("the scan_path() command found the following files in the specified folder: {}".format(filenames))
-        
-
-    def calc_temps(self):
-        """Takes every diffractogram and runs get_pt_info on it. 
-        Right now it only ask for the temperature calculated from 2nd degree polynomial peak fitting
-        At the end it creates a dataframe with the filenames and temperature"""        
-
-        data = []
-        for diff in self.diffs:
-            pt_info = diff.get_pt_info(Temp = True)
-            pt_info["Filename"] = diff.name
-            data.append(pt_info)
-
-        self.df_temp = pd.DataFrame(data)
-
-        print(self.df_temp)
-
-def help():
-    LOG.warning("You can't get help yet!")
 
 def init(args):
     """Initializes working directory for fastdiff"""
 
+    import sys
+    import os
+    import toml
+    import shutil
+
     def _make_workdir(dir):
         # Make config templates
-        kwargs = {
-            "zoom" : [(18.0,19.5), (35.0,40.0)],
-            "xlim" : (15, 70),
-            "ticks" : ['SRM', 'Fd3m'],
-            "d_spacing" : True,
-        }
         
         try:
-            os.mkdir(args[0])
+            os.mkdir(dir)
             # Make user folders
-            os.mkdir(os.path.join(args[0], "CIF"))
-            os.mkdir(os.path.join(args[0], "data"))
+            os.mkdir(os.path.join(dir, "CIF"))
+            os.mkdir(os.path.join(dir, "data"))
 
-            with open('plot.toml', 'w') as f:
-                toml.dump(kwargs, f)
+            with open(os.path.join(dir,'plot.toml'), 'w') as f:
+                toml.dump(plot_kwargs, f)
 
-        except Any as e:
-            LOG.error("Could not create new working directory {}. Error message: {}".format(args[0], e))
+            with open(os.path.join(dir,'config.toml'), 'w') as f:
+                toml.dump(analysis_kwargs, f)
+
+        except Exception as e:
+            LOG.error("Could not create new working directory '{}'. Error message: {}".format(dir, e))
             sys.exit()
 
 
     def _handle_path(dir):
-        if not args:
-            LOG.error("You MUST choose a working directory by typing 'fastdiff init <dirname>'.")
-            sys.exit()
-        elif os.path.isdir(args[0]):
+        
+        if os.path.isdir(args[0]):
             LOG.warning("Folder '{}' already exist. Would you like to overwrite it? [Y/n]".format(args[0]))
             answer = input()
 
@@ -137,6 +67,9 @@ def init(args):
                 LOG.warning("You chose not to delete the old directory. Exiting.")
                 sys.exit()
 
+    if not args:
+        LOG.error("You MUST choose a working directory by typing 'fastdiff init <dirname>'.")
+        sys.exit()
 
     _handle_path(args[0])
     _make_workdir(args[0])
@@ -145,24 +78,114 @@ def init(args):
     LOG.debug("Initializing new work environment")
 
 
+def run(args):
+    import os
+    import sys
 
-        
+    # Load configuration
+    config, workdir = load_config(args)
 
-        
+    # Initialize total data object
+    from data import Data
+    data = Data(workdir,config)
 
-        
 
+    # Act on configuration
+
+    if config["plot"]:
+        data.plot()
     
+    if config["convert-to-dspacing"]:
+        LOG.warning("d-spacing conversion not implemented.")
 
-def run(_):
-    print("running masterpiece")
+    if config["temp-from-internal-standard"]:
+        LOG.warning("Temperature analysis from internal standard not implemented.")
+
+    if config["calibrate-with-internal-standard"]:
+        LOG.warning("internal standard 2theta calibration not implemented.")
+
+    if type(config["internal-standard"]) is str:
+        LOG.warning("Internal standard in itself not implemented.")
+
+
+def load_config(args):
+    import os
+    import sys
+
+    ## Create path
+    if args[0]:
+        workdir = args[0]
+        cfgpath = os.path.join(workdir, "config.toml")
+    else:
+        workdir = "./"
+        cfgpath = "./config.toml"
+    
+    ## Check that it exists
+    if not os.path.isfile(cfgpath):
+        LOG.error("Cannot find '{}'. Did you initialize a working directory?".format(cfgpath))
+        sys.exit()
+    else:
+        # File exits! Time to load config!
+        import toml
+        try:
+            with open(cfgpath, 'r') as f:
+                config = toml.load(f)
+        except Exception as e:
+            LOG.error("Could not read configuration file '{}'. Error message: \n{}".format(cfgpath, e))
+            sys.exit()
+
+        if config["debugging-mode"]:
+            LOG.set_level("DEBUG")
+            LOG.debug("Debug mode active")
+
+        LOG.debug("Found and loaded config file '{}'.".format(cfgpath))
+    
+    return config, workdir
+
 
 def version(_):
-    print("version")
+    LOG.info("Shit! I forgot to make this function! Please ask me to implement it asap :)")
+
 
 def check_dependencies(_):
-    print("Checking dependencies")
+    imports = ["os", "sys", "numpy", "pandas", "toml", "PyCifRW"]
+    modules = []
+    missing_packages = []
+    for x in imports:
+        try:
+            modules.append(__import__(x))
+            LOG.debug("Found package: {}".format(x))
+        except ImportError:
+            LOG.debug("Error importing {}.".format(x))
+            missing_packages.append(x)
 
+    
+    if len(missing_packages) > 0:
+        LOG.error("Could not find the following packages: {}".format(missing_packages))
+    else:
+        LOG.success("All packages are successfully installed!")
+
+
+def main():
+    """Main function, takes user args and runs eventual commands"""
+    import sys
+    args = sys.argv
+    command_args = None
+    if len(args) == 1:
+        help()
+        sys.exit()
+    elif len(args) == 2:
+        command = args[1]
+        command_args = []
+    else:
+        command = args[1]
+        command_args = args[2:]
+
+    if not command in command_lookup:
+        LOG.error(f"Unknown command \"{command}\"")
+    
+    command_lookup[command](command_args)
+        
 
 command_lookup = {
     "run": run,
@@ -172,31 +195,25 @@ command_lookup = {
     "--help": help,
     "-v": version,
     "--version": version,
-    "--check-dependencies": check_dependencies
+    "--check-deps": check_dependencies
 }
 
+analysis_kwargs = {
+    "files" : ["file.xy", "file1.xye"],
+    "convert-to-dspacing" : False,
+    "temp-from-internal-standard": False,
+    "calibrate-with-internal-standard": False,
+    "internal-standard" : "Pt",
+    "debugging-mode": False,
+    "plot": True,
+}
 
-def main():
-    """Main function, takes user args and runs eventual commands"""
-    args = sys.argv
-    command_args = None
-    if len(args) == 1:
-        help()
-        sys.exit()
-    elif len(args) == 2:
-        command = args[1]
-    else:
-        command = args[1]
-        command_args = args[2:]
-
-    try:
-        try:
-            command_lookup[command](command_args)
-        except KeyboardInterrupt:
-            print(); sys.exit()
-    except KeyError:
-        LOG.error(f"Unknown command \"{command}\"")
-
+plot_kwargs = {
+    "zoom" : [(18.0,19.5), (35.0,40.0)],
+    "xlim" : (15, 70),
+    "ticks" : ['SRM', 'Fd3m'],
+    "d_spacing" : True,
+}
 
 
 if __name__ == "__main__":
