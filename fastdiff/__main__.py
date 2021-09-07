@@ -1,9 +1,12 @@
-"""Main"""
+"""Main, this is ran when the user calls fastdiff."""
 
+from typing import Any
 from log import LOG
 
 import sys
 import os
+import toml
+import shutil
 import pandas as pd
 
 #from cli import args
@@ -12,11 +15,6 @@ import pandas as pd
 # Initialize global settings
 #settings.init() 
 
-
-# Importing submodules
-#import diff.diff as diff
-#import materials.materials as materials
-#import plot.plot as plot
 
 class Mainclass():
     """Main class"""
@@ -84,44 +82,77 @@ class Mainclass():
 
         print(self.df_temp)
 
-def help(_):
-    print("You can't get help yet")
+def help():
+    LOG.warning("You can't get help yet!")
 
 def init(args):
-    import toml
-    import os
+    """Initializes working directory for fastdiff"""
 
-    if not args:
-        LOG.error("You MUST choose a working directory by typing 'fastdiff init <dirname>'.")
-        sys.exit()
-    elif os.path.isdir(args[0]):
-        LOG.info("Folder {} already exist".format(args[0]))
-        sys.exit()
-    else:
+    def _make_workdir(dir):
+        # Make config templates
+        kwargs = {
+            "zoom" : [(18.0,19.5), (35.0,40.0)],
+            "xlim" : (15, 70),
+            "ticks" : ['SRM', 'Fd3m'],
+            "d_spacing" : True,
+        }
+        
         try:
             os.mkdir(args[0])
-        except:
-            LOG.error("Could not create new working directory {}".format(args[0]))
+            # Make user folders
+            os.mkdir(os.path.join(args[0], "CIF"))
+            os.mkdir(os.path.join(args[0], "data"))
+
+            with open('plot.toml', 'w') as f:
+                toml.dump(kwargs, f)
+
+        except Any as e:
+            LOG.error("Could not create new working directory {}. Error message: {}".format(args[0], e))
             sys.exit()
+
+
+    def _handle_path(dir):
+        if not args:
+            LOG.error("You MUST choose a working directory by typing 'fastdiff init <dirname>'.")
+            sys.exit()
+        elif os.path.isdir(args[0]):
+            LOG.warning("Folder '{}' already exist. Would you like to overwrite it? [Y/n]".format(args[0]))
+            answer = input()
+
+            if answer in ["", "Y", "y", "Yes", "yes"]:
+                LOG.warning("This will delete everything in that folder!! Are you sure you want to continue? [Y/n]")
+                answer2 = input()
+
+                if answer2 in ["", "Y", "y", "Yes", "yes"]:
+                    try:
+                        shutil.rmtree(args[0])
+                    except PermissionError as e:
+                        LOG.error("You do not have permission to remove the old directory! Error message: {}. Exiting.".format(e))
+                        sys.exit()
+
+                else:
+                    LOG.warning("You chose not to delete the old directory. Exiting.")
+                    sys.exit()
+            else:
+                LOG.warning("You chose not to delete the old directory. Exiting.")
+                sys.exit()
+
+
+    _handle_path(args[0])
+    _make_workdir(args[0])
+    LOG.success("Created working directory in folder '{}'.".format(args[0]))
 
     LOG.debug("Initializing new work environment")
 
+
+
+        
+
+        
+
+        
+
     
-
-    # Make user folders
-    os.mkdir(os.path.join(args[0], "CIF"))
-    os.mkdir(os.path.join(args[0], "data"))
-
-    # Make config templates
-    kwargs = {
-        "zoom" : [(18.0,19.5), (35.0,40.0)],
-        "xlim" : (15, 70),
-        "ticks" : ['SRM', 'Fd3m'],
-        "d_spacing" : True,
-    }
-
-    with open('plot.toml', 'w') as f:
-        toml.dump(kwargs, f)
 
 def run(_):
     print("running masterpiece")
@@ -146,6 +177,7 @@ command_lookup = {
 
 
 def main():
+    """Main function, takes user args and runs eventual commands"""
     args = sys.argv
     command_args = None
     if len(args) == 1:
@@ -168,7 +200,6 @@ def main():
 
 
 if __name__ == "__main__":
-    #Main(args)
     main()
 
     
