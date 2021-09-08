@@ -2,14 +2,13 @@
 
 from log import LOG
 
+
 class Data():
     """Main data class"""
-
+    
     def __init__(self, workdir, config):
         """Initialize main data object"""
         import os
-        import sys
-        import toml
 
 
         LOG.debug("Initializing main data object")
@@ -20,7 +19,7 @@ class Data():
         self.diffs = []
 
         # Scan datafolder
-        self.filenames = self.scan_path(os.path.join(workdir, "/data/"))
+        self.filenames = self.scan_path(os.path.join(workdir, "data"))
 
 
     def scan_path(self, path):
@@ -43,15 +42,30 @@ class Data():
 
         return filenames
         
+    def load_data(self):
+        import os
+        from diff import diff
+
+        for filename in self.filenames:
+            self.diffs.append(diff(os.path.join(self.workdir, "data", filename)))
+
 
     def plot(self):
+        import os
+        import sys
+        import toml
+        from plot import plot
         LOG.warning("Shit! I haven't implemented the data-class plot feature yet!")
         # Loading plot config
-        #with open(os.path.join(self.workdir, "plot.toml")) as f:
-        #    self.plotcfg = toml.load(f,)
+        try:
+            with open(os.path.join(self.workdir, "plot.toml")) as f:
+                self.plotcfg = toml.load(f,)
+        except Exception as e:
+            LOG.error("Could not read 'plot.toml'! Error message: {}".format(e))
+            sys.exit()
 
         # Starting plot
-        #plot.plot(self.diffs, **self.plotkwargs)
+        plot(self.diffs, **self.plotcfg)
         #elif self.args.plot:
         #    plot.plot(self.diffs)
         #sys.exit()
