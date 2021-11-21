@@ -37,7 +37,7 @@ class Data():
                 filenames.append(file)
             
         #Tell the user about the files found
-        LOG.debug("the scan_path() command found the following files in the specified folder: {}".format(filenames))
+        LOG.debug("the scan_path() command found the following files in the specified folder:", filenames)
         LOG.info("Found {} files in folder '{}'.".format(len(filenames), path))
 
         return filenames
@@ -54,7 +54,7 @@ class Data():
         import os
         import sys
         import toml
-        from plot import plot
+        import plot
         LOG.warning("Shit! I haven't implemented the data-class plot feature yet!")
         # Loading plot config
         try:
@@ -65,7 +65,7 @@ class Data():
             sys.exit()
 
         # Starting plot
-        plot(self.diffs, **self.plotcfg)
+        plot.plot(self.diffs, **self.plotcfg)
         #elif self.args.plot:
         #    plot.plot(self.diffs)
         #sys.exit()

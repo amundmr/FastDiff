@@ -1,8 +1,8 @@
 
+# -*- coding: utf-8 -*-
 """
 Custom logger
 Author: Knut Magnus Aasrud, from here: https://github.com/kmaasrud/doctor/blob/f6eea662de64dd2fa7a19548e71790ebd5084f3c/kodb/log.py
-
 """
 
 import inspect
@@ -37,7 +37,7 @@ class Message:
         self.__init__(level)
 
 
-    def print_message(self, msg, level_name, *styles, file=None):
+    def print_message(self, msg, level_name, *styles, file=None, lst = None):
         if self.level >= LEVELS[level_name]:
             if file:
                 # If there's room, then first print the name of the calling file right aligned
@@ -47,33 +47,39 @@ class Message:
             # Then print the message with the message level styled
             print("[" + self.style(level_name, *styles) + "]" + ":", msg)
 
+            if lst:
+                # Then print the list
+                leftlength = len("[" + level_name + "]" + ":") * " "
+                for element in lst:
+                    print(leftlength + str(element))
+            
 
-    def debug(self, msg):
+    def debug(self, msg, lst = None):
         from_frame = inspect.stack()[1]
         file = inspect.getfile(from_frame[0])
-        self.print_message(msg, "DEBUG", "bold", file=file)
+        self.print_message(msg, "DEBUG", "bold", file=file, lst=lst)
 
 
-    def info(self, msg):
-        self.print_message(msg, "INFO", "bold", "blue")
+    def info(self, msg, lst = None):
+        self.print_message(msg, "INFO", "bold", "blue", lst=lst)
 
 
-    def success(self, msg):
-        self.print_message(msg, "SUCCESS", "bold", "green")
+    def success(self, msg, lst = None):
+        self.print_message(msg, "SUCCESS", "bold", "green", lst=lst)
 
 
-    def warning(self, msg):
-        self.print_message(msg, "WARNING", "bold", "yellow")
+    def warning(self, msg, lst = None):
+        self.print_message(msg, "WARNING", "bold", "yellow", lst=lst)
 
 
-    def error(self, msg):
-        self.print_message(msg, "ERROR", "bold", "red")
+    def error(self, msg, lst = None):
+        self.print_message(msg, "ERROR", "bold", "red", lst=lst)
 
 
-    def critical(self, msg):
+    def critical(self, msg, lst = None):
         from_frame = inspect.stack()[1]
         file = inspect.getfile(from_frame[0])
-        self.print_message(msg, "C", "bold", "red", "underline", file=file)
+        self.print_message(msg, "C", "bold", "red", "underline", file=file, lst=lst)
 
     def style(self, text, *styles):
         code = {
@@ -107,4 +113,4 @@ class Message:
         if left_align_len + len(text) < columns:
             return(text.rjust(columns))
 
-LOG = Message("INFO")
+LOG = Message("DEBUG")

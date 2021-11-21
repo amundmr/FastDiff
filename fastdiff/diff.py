@@ -35,7 +35,7 @@ class diff():
         LOG.debug('Initializing diff object {}'.format(filename))
 
         self.name = os.path.basename(filename)
-        self.wavelength = settings.WAVELENGTH # TODO replace this with reader for capturing this data
+        self.wavelength = 0.6 # TODO replace this with reader for capturing this data
 
         # Open file
         try:
@@ -46,7 +46,7 @@ class diff():
             self._create_arrays()
 
         except Exception as e:
-            LOG.warning("Error occurred while opening the file {}".format(filename))
+            LOG.warning("Error occurred while opening the file {}: {}".format(filename, e))
 
 
     def _create_arrays(self):
@@ -59,7 +59,7 @@ class diff():
 
         # Transpose array is easier to plot
         self.xye_t = np.transpose(self.xye)
-
+        LOG.debug("Data array: {}".format(self.xye_t))
 
     def __repr__(self) -> str:
         return "diff Object: {}".format(self.name)

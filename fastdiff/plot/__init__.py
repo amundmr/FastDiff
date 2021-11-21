@@ -8,12 +8,14 @@ from math import sqrt
 from numpy.lib.function_base import _diff_dispatcher
 import plot.utils as utils
 import plot.conversion as convert
-import materials.materials as materials
+import materials
 from log import LOG
 
 def plot(diffObjects, **kwargs):
     fig = plt.figure(figsize=(10,5)) #, tight_layout=True
     fig.suptitle(str(date.today()))
+
+    LOG.debug("Diffobjects: ", lst = diffObjects)
 
     if 'zoom' in kwargs:
         n_zooms = len(kwargs['zoom'])
@@ -58,7 +60,7 @@ def plot(diffObjects, **kwargs):
         ax.tick_params(direction='in', top = 'true', right = 'true')
         for diffObj in diffObjects:
             labelname = diffObj.name
-            dat = diffObj.xye
+            dat = diffObj.xye_t
 
             if 'd_spacing' in kwargs:
                 if kwargs['d_spacing'] == True:

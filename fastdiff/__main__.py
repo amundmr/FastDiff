@@ -23,34 +23,57 @@ def init(args):
     import toml
     import shutil
 
-    def _make_workdir(dir):
+    def _make_workdir(dir, filepaths):
         # Make config templates
         
         try:
-            os.mkdir(dir)
+            workdir = os.path.join(dir, 'workdir')
+            os.mkdir(workdir)
             # Make user folders
-            os.mkdir(os.path.join(dir, "CIF"))
-            os.mkdir(os.path.join(dir, "data"))
+            os.mkdir(os.path.join(workdir, "CIF"))
+            os.mkdir(os.path.join(workdir, "data"))
 
-            with open(os.path.join(dir,'plot.toml'), 'w') as f:
+            with open(os.path.join(workdir,'plot.toml'), 'w') as f:
                 toml.dump(plot_kwargs, f)
 
-            with open(os.path.join(dir,'config.toml'), 'w') as f:
+            with open(os.path.join(workdir,'config.toml'), 'w') as f:
                 toml.dump(analysis_kwargs, f)
 
         except Exception as e:
-            LOG.error("Could not create new working directory '{}'. Error message: {}".format(dir, e))
+            LOG.error("Could not create new working directory '{}'. Error message: {}".format(workdir, e))
             sys.exit()
 
+        if filepaths: #Then we'll copy them to the data dir, totally shamelessly
+            for filepath in filepaths:
+                destination = os.path.join(workdir, 'data', os.path.basename(filepath))
+                shutil.copyfile(filepath, destination)
+
+    def scan_path(path):
+        """Scans the path inserted for supported filetypes and returns as list"""
+
+        filepaths = []
+        for (dirpath, dirnames, filenames) in os.walk(path):
+            for file in filenames:
+                if file.split(".")[-1] == "xye":
+                    filepaths.append(os.path.join(dirpath, file))
+                    
+        filepaths.sort(key=lambda x: os.path.basename(x))
+        #for filepath in filepaths:
+        #    self.diffs.append(diff.diff(filepath))
+
+        #Tell the user about the files found
+        LOG.success("the scan_path() command found the following files in the specified folder:", lst = filepaths)
+        return filepaths
 
     def _handle_path(dir):
-        
+        filepaths = None
         if os.path.isdir(args[0]):
-            LOG.warning("Folder '{}' already exist. Would you like to overwrite it? [Y/n]".format(args[0]))
+            #LOG.warning("Folder '{}' already exist. Would you like to overwrite it? [Y/n]".format(args[0]))
+            LOG.warning("Folder '{}' already exist. Would you like to scan for data in it and create a 'workdir' folder in it with eventual data? [Y/n]".format(args[0]))
             answer = input()
 
             if answer in ["", "Y", "y", "Yes", "yes"]:
-                LOG.warning("This will delete everything in that folder!! Are you sure you want to continue? [Y/n]")
+                """LOG.warning("This will delete everything in that folder!! Are you sure you want to continue? [Y/n]")
                 answer2 = input()
 
                 if answer2 in ["", "Y", "y", "Yes", "yes"]:
@@ -62,17 +85,23 @@ def init(args):
 
                 else:
                     LOG.warning("You chose not to delete the old directory. Exiting.")
-                    sys.exit()
+                    sys.exit()"""
+                filepaths = scan_path(args[0])
+
+
             else:
-                LOG.warning("You chose not to delete the old directory. Exiting.")
+                #LOG.warning("You chose not to delete the old directory. Exiting.")
+                LOG.warning("You chose not to continue. Exiting.")
                 sys.exit()
+
+        return filepaths
 
     if not args:
         LOG.error("You MUST choose a working directory by typing 'fastdiff init <dirname>'.")
         sys.exit()
 
-    _handle_path(args[0])
-    _make_workdir(args[0])
+    filepaths = _handle_path(args[0])
+    _make_workdir(args[0], filepaths)
     LOG.success("Created working directory in folder '{}'.".format(args[0]))
 
     LOG.debug("Initializing new work environment")
@@ -93,8 +122,10 @@ def run(args):
     # Act on configuration
 
     if config["plot"]:
+        LOG.debug("Running data.plot()")
+        data.load_data()
         data.plot()
-    
+        
     if config["convert-to-dspacing"]:
         LOG.warning("d-spacing conversion not implemented.")
 
@@ -125,7 +156,7 @@ def load_config(args):
         LOG.error("Cannot find '{}'. Did you initialize a working directory?".format(cfgpath))
         sys.exit()
     else:
-        # File exits! Time to load config!
+        # File exists! Time to load config!
         import toml
         try:
             with open(cfgpath, 'r') as f:
