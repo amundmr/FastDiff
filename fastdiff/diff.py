@@ -43,9 +43,14 @@ class diff():
 
             # Interpret data
             self._create_arrays()
+            self._convert_to_Q()
 
         except Exception as e:
             LOG.warning("Error occurred while opening the file {}: {}".format(filename, e))
+
+    def _convert_to_Q(self):
+        """Converts self.xye_t to qs"""
+        self.xye_t[0] = 4 * (np.pi / self.wavelength) * np.sin(self.xye_t[0]/2 * (np.pi/180)) 
 
 
     def _create_arrays(self):

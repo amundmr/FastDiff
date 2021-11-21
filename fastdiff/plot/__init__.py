@@ -23,7 +23,7 @@ def plot(diffObjects, **kwargs):
         ax = fig.add_subplot(gs[1,:])
         ax.set(
         ylabel = r'Square rooted Intensity [\sqrt{counts}]',
-        xlabel = r'TwoTheta [$2\theta$], WL=1.54060'
+        xlabel = r'Q-range [Å${⁻1}$]'
         )
         
         for i,zoom in enumerate(kwargs['zoom']):
@@ -34,8 +34,11 @@ def plot(diffObjects, **kwargs):
 
     else:
         ax = plt.subplot()
+        ax.set(
+        ylabel = r'Square rooted Intensity [$\sqrt{counts}$]',
+        xlabel = r'Q-range [Å$^{⁻1}$]'
+        )
 
-        
     axs = fig.get_axes()
 
     if 'ticks' in kwargs:

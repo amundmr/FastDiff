@@ -58,8 +58,6 @@ def init(args):
                     filepaths.append(os.path.join(dirpath, file))
                     
         filepaths.sort(key=lambda x: os.path.basename(x))
-        #for filepath in filepaths:
-        #    self.diffs.append(diff.diff(filepath))
 
         #Tell the user about the files found
         LOG.success("the scan_path() command found the following files in the specified folder:", lst = filepaths)
@@ -108,8 +106,6 @@ def init(args):
 
 
 def run(args):
-    import os
-    import sys
 
     # Load configuration
     config, workdir = load_config(args)

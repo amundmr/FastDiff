@@ -26,28 +26,26 @@ class Data():
         """Scans the path inserted for supported filetypes and returns as list"""
         import os
 
-        dir_files = []
+        filepaths = []
         for (dirpath, dirnames, filenames) in os.walk(path):
-            dir_files.extend(filenames)
-            
-
-        filenames = []
-        for file in dir_files:
-            if file.split(".")[-1] == "xye":
-                filenames.append(file)
-            
+            for file in filenames:
+                if file.split(".")[-1] == "xye":
+                    filepaths.append(os.path.join(dirpath, file))
+                    
+        filepaths.sort(key=lambda x: os.path.basename(x))
+        LOG.debug(filepaths)
         #Tell the user about the files found
         LOG.debug("the scan_path() command found the following files in the specified folder:", filenames)
-        LOG.info("Found {} files in folder '{}'.".format(len(filenames), path))
+        LOG.info("Found {} files in folder '{}'.".format(len(filepaths), path))
 
-        return filenames
+        return filepaths
         
     def load_data(self):
         import os
         from diff import diff
 
         for filename in self.filenames:
-            self.diffs.append(diff(os.path.join(self.workdir, "data", filename)))
+            self.diffs.append(diff(filename))
 
 
     def plot(self):
