@@ -1,6 +1,6 @@
 """Contains main data class"""
 
-from log import LOG
+from __main__ import LOG
 
 
 class Data():

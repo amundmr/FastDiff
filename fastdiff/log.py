@@ -113,4 +113,4 @@ class Message:
         if left_align_len + len(text) < columns:
             return(text.rjust(columns))
 
-LOG = Message("DEBUG")
+LOG = Message("INFO")

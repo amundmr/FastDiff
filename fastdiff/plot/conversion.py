@@ -1,5 +1,6 @@
 """All conversion functions needed"""
 import numpy as np
+from __main__ import LOG
 
 def twotheta2d(tth):
     th = tth/2

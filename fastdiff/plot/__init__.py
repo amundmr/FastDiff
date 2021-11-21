@@ -9,13 +9,13 @@ from numpy.lib.function_base import _diff_dispatcher
 import plot.utils as utils
 import plot.conversion as convert
 import materials
-from log import LOG
+from __main__ import LOG
 
 def plot(diffObjects, **kwargs):
     fig = plt.figure(figsize=(10,5)) #, tight_layout=True
     fig.suptitle(str(date.today()))
 
-    LOG.debug("Diffobjects: ", lst = diffObjects)
+    #LOG.debug("Diffobjects coming in to the plot.plot function: ", lst = diffObjects)
 
     if 'zoom' in kwargs:
         n_zooms = len(kwargs['zoom'])

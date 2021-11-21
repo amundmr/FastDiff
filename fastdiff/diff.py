@@ -3,10 +3,9 @@
 import os
 import numpy as np
 import pandas as pd
-from log import LOG
+from __main__ import LOG
 import scipy
 import sys
-import settings
 
 
 
@@ -59,7 +58,6 @@ class diff():
 
         # Transpose array is easier to plot
         self.xye_t = np.transpose(self.xye)
-        LOG.debug("Data array: {}".format(self.xye_t))
 
     def __repr__(self) -> str:
         return "diff Object: {}".format(self.name)
