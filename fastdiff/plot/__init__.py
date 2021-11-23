@@ -44,13 +44,15 @@ def plot(dataObject, **kwargs):
 
     if 'ticks' in kwargs:
         mats = []
+        # Search for materials in the user config
         for mat in kwargs['ticks']: #loop materials in the ticks thing
             if "Fd3m" in mat:
                 mats.append(materials.LMNOFd3m)
             elif "SRM" in mat or "Si" in mat:
                 mats.append(materials.SRM640d)
+        # Plot the hkl's associated with a material
         for mat in mats:
-            for i in range(len(mat.two_thetas)):
+            for i in range(len(mat.q_values)):
                 if i == 0:
                     axs[0].scatter(mat.q_values[i], -2, label = mat.label, color = mat.color, marker = "|")
                     axs[0].scatter(mat.q_values[i], -4.5, color = mat.color, marker = mat.hkls[i], s=200)
