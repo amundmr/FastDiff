@@ -101,7 +101,19 @@ class Data():
             #if self.cfg["internal-standard"] in crystal.cif["_chemical_formula_structural"] or self.cfg["internal-standard"] in crystal.cif["_chemical_name_common"]:
             found = True
             crystal.Scatter._powder_units = "Q"
-            self.standard_peaks = self._simulate_powder(crystal, energy_kev=8)
+            #self.standard_peaks = self._simulate_powder(crystal, energy_kev=8)
+
+            #Gives np array with intensity over q-range of powder.
+            self.standard_powder_pattern = crystal.Scatter.generate_powder()
+
+            #Gives string with visible peaks: miller index, 2th and intensity
+            self.standard_powder_peaks = crystal.Scatter.print_all_reflections()
+            LOG.debug("Info on the internal standard chosen:\n{}".format(self.standard_powder_peaks))
+
+            #Plan: Convert string to dataframe, pick out some peaks and choose these peaks to modulate and fit the temperature.
+            
+            self.standard_powder_peaks_df = pd.DataFrame(self.standard_powder_peaks, header=2, sep = " ")
+            LOG.warning(self.standard_powder_peaks_df.head)
 
             LOG.debug("Using cif '{}' as internal standard.".format(self.cifnames[i]))
                 #break

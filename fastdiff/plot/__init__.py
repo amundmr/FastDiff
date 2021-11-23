@@ -72,7 +72,7 @@ def plot(dataObject, **kwargs):
 
             ax.plot(dat[0], dat[1], label = labelname)
         try:
-            x,y = dataObject.standard_peaks
+            x,y = dataObject.standard_powder_pattern
             ax.plot(x, y, label = "Internal standard")
         except Exception as e:
             LOG.debug("No internal standard plotted: {}".format(e))#do nothing
