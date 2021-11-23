@@ -52,11 +52,11 @@ def plot(dataObject, **kwargs):
         for mat in mats:
             for i in range(len(mat.two_thetas)):
                 if i == 0:
-                    axs[0].scatter(mat.two_thetas[i], -2, label = mat.label, color = mat.color, marker = "|")
-                    axs[0].scatter(mat.two_thetas[i], -4.5, color = mat.color, marker = mat.hkls[i], s=200)
+                    axs[0].scatter(mat.q_values[i], -2, label = mat.label, color = mat.color, marker = "|")
+                    axs[0].scatter(mat.q_values[i], -4.5, color = mat.color, marker = mat.hkls[i], s=200)
                 else:
-                    axs[0].scatter(mat.two_thetas[i], -2, color = mat.color, marker = "|")
-                    axs[0].scatter(mat.two_thetas[i], -4.5, color = mat.color, marker = mat.hkls[i], s=200)
+                    axs[0].scatter(mat.q_values[i], -2, color = mat.color, marker = "|")
+                    axs[0].scatter(mat.q_values[i], -4.5, color = mat.color, marker = mat.hkls[i], s=200)
 
 
 
@@ -93,4 +93,4 @@ def plot(dataObject, **kwargs):
     axs[0].legend()
     LOG.debug("Showing plot")
     plt.show()
-    plt.savefig("PLOT.png")
+    #plt.savefig("PLOT.png")

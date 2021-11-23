@@ -33,9 +33,17 @@ def init(args):
             os.mkdir(os.path.join(workdir, "CIF"))
             os.mkdir(os.path.join(workdir, "data"))
 
+            #Write plot.toml file
             with open(os.path.join(workdir,'plot.toml'), 'w') as f:
                 toml.dump(plot_kwargs, f)
 
+            #Insert filepaths in analysis kwargs
+            basenames_in_datafolder = []
+            for filepath in filepaths:
+                basenames_in_datafolder.append(os.path.join("data", os.path.basename(filepath)))
+            analysis_kwargs["files"] = basenames_in_datafolder
+
+            #Write config.toml file
             with open(os.path.join(workdir,'config.toml'), 'w') as f:
                 toml.dump(analysis_kwargs, f)
 
@@ -240,7 +248,8 @@ plot_kwargs = {
     "zoom" : [(18.0,19.5), (35.0,40.0)],
     "xlim" : (15, 70),
     "ticks" : ['SRM', 'Fd3m'],
-    "d_spacing" : True,
+    "d_spacing" : False,
+    "savepath": "NOT IMPLEMENTED YET",
 }
 
 

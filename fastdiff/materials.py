@@ -2,7 +2,9 @@
 
 class Material():
     def __init__(self, d_spacings, two_thetas, I_fixs, hkls, color, codid, label):
+        import numpy as np
         self.d_spacings = d_spacings
+        self.q_values = 4 * (np.pi / 1.5406) * np.sin(np.array(two_thetas)/2 * (np.pi/180))
         self.two_thetas = two_thetas
         self.I_fixs = I_fixs
         self.hkls = hkls

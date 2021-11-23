@@ -22,7 +22,10 @@ class Data():
         self.cifs = []
 
         # Scan datafolder
-        self.filenames = self.scan_path(os.path.join(workdir, "data"))
+        self.filenames = [os.path.join(workdir, x) for x in self.cfg["files"]]
+        files_in_datafolder = self.scan_path(os.path.join(workdir, "data"))
+        if len(files_in_datafolder) > len(self.filenames):
+            LOG.debug("There are {} files in the datafolder, while the user only chose to use {} files in the config.toml".format(len(files_in_datafolder), len(self.filenames)))
 
         # Scan CIF folder
         self.cifnames = self.scan_path(os.path.join(workdir, "CIF"))
@@ -111,7 +114,7 @@ class Data():
             LOG.debug("Info on the internal standard chosen:\n{}".format(self.standard_powder_peaks))
 
             #Plan: Convert string to dataframe, pick out some peaks and choose these peaks to modulate and fit the temperature.
-            
+
             self.standard_powder_peaks_df = pd.DataFrame(self.standard_powder_peaks, header=2, sep = " ")
             LOG.warning(self.standard_powder_peaks_df.head)
 
