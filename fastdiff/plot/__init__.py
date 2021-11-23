@@ -36,7 +36,7 @@ def plot(dataObject, **kwargs):
     else:
         ax = plt.subplot()
         ax.set(
-        ylabel = r'Square rooted Intensity [$\sqrt{counts}$]',
+        ylabel = 'Intensity [counts]', #r'Square rooted Intensity [$\sqrt{counts}$]',
         xlabel = r'Q-range [Å$^{⁻1}$]'
         )
 
