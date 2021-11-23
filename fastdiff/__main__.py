@@ -110,22 +110,23 @@ def run(args):
     # Load configuration
     config, workdir = load_config(args)
 
+    # Set debugging mode asap
+    if config["debugging-mode"]:
+            LOG.set_level("DEBUG")
+            LOG.debug("Debug mode active")
+
     # Initialize total data object
     from data import Data
     data = Data(workdir,config)
-
+    data.load_data()
 
     # Act on configuration
-
-    if config["plot"]:
-        LOG.debug("Running data.plot()")
-        data.load_data()
-        data.plot()
         
     if config["convert-to-dspacing"]:
         LOG.warning("d-spacing conversion not implemented.")
 
     if config["temp-from-internal-standard"]:
+        data.calc_temps()
         LOG.warning("Temperature analysis from internal standard not implemented.")
 
     if config["calibrate-with-internal-standard"]:
@@ -133,6 +134,10 @@ def run(args):
 
     if type(config["internal-standard"]) is str:
         LOG.warning("Internal standard in itself not implemented.")
+
+    if config["plot"]:
+        LOG.debug("Running data.plot()")
+        data.plot()
 
 
 def load_config(args):
@@ -160,10 +165,6 @@ def load_config(args):
         except Exception as e:
             LOG.error("Could not read configuration file '{}'. Error message: \n{}".format(cfgpath, e))
             sys.exit()
-
-        if config["debugging-mode"]:
-            LOG.set_level("DEBUG")
-            LOG.debug("Debug mode active")
 
         LOG.debug("Found and loaded config file '{}'.".format(cfgpath))
     

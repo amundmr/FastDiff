@@ -14,6 +14,10 @@ PEAK_INTERVALS = [  (15.5, 16, (1,1,1)),     # 111 plane distance peak
                     (17.8, 18.3, (2,0,0)),   # 200 plane distance peak
                     (36.5, 37, (4,0,0))]     # 400 plane distance peak
 
+PEAK_INTERVALS_Q = [  (2.72, 2.8, (1,1,1)),     # 111 plane distance peak
+                    (3.164, 3.22, (2,0,0)),]   # 200 plane distance peak
+                    #(5.70958, 5.785082, (4,0,0))]     # 400 plane distance peak
+
 #temp (K) and lp_a (nm) from https://www.technology.matthey.com/article/41/1/12-21/
 PLATINA_TEMP = [
 [0, 10, 20, 30,40,50,60,70,80,90,100,110,120,130,140,150,160,180,200,220,240,260,280,293.15,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2041.3],
@@ -34,7 +38,7 @@ class diff():
         LOG.debug('Initializing diff object {}'.format(filename))
 
         self.name = os.path.basename(filename)
-        self.wavelength = 0.6 # TODO replace this with reader for capturing this data
+        self.wavelength = 0.68925 # TODO replace this with reader for capturing this data
 
         # Open file
         try:
@@ -108,7 +112,8 @@ class diff():
         peak_info = []
 
         ## Scan the intervals for the twotheta value with maximum intensity
-        for peak in PEAK_INTERVALS:
+        for peak in PEAK_INTERVALS_Q:
+            
             # First find indexes which match the scannable area
             index1 = (np.abs(self.xye_t[0]-peak[0])).argmin()
             index2 = (np.abs(self.xye_t[0]-peak[1])).argmin()
@@ -117,7 +122,7 @@ class diff():
             # Get 2Theta at this index
             twotheta = self.xye_t[0][index_max]
             # Calculate d_spacing
-            d = d_spacing(twotheta)
+            d = 1/twotheta # Replaced d_spacing(twotheta) since we are now working with Q ranges
             # Calculate lattice constant alpha
             a = lattice_const(d, peak[2])
             a_lst.append(a)
@@ -125,7 +130,7 @@ class diff():
             xcurve, ycurve, twoth_max = curve_fit(self.xye_t[0][index_max-2:index_max+3], self.xye_t[1][index_max-2:index_max+3])
             curve_lst.append((xcurve, ycurve))
             # Calculate d_spacing
-            d_curve = d_spacing(twoth_max)
+            d_curve = 1/twoth_max # replaced d_spacing(twoth_max) since we are working with q ranges
             # Calculate lattice constant alpha
             a_curve = lattice_const(d_curve, peak[2])
             a_curve_lst.append(a_curve)
@@ -197,6 +202,7 @@ def tempfunc_platina(lpa):
     #plt.scatter(0.395, f(0.395))
     #plt.plot(PLATINA_TEMP[1],f(PLATINA_TEMP[1]))
     #plt.show()
+    LOG.success("Lattice parameter: {}".format(lpa))
     return float(f(lpa))
 
 

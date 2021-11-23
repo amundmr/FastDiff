@@ -11,7 +11,8 @@ import plot.conversion as convert
 import materials
 from __main__ import LOG
 
-def plot(diffObjects, **kwargs):
+def plot(dataObject, **kwargs):
+    diffObjects = dataObject.diffs
     fig = plt.figure(figsize=(10,5)) #, tight_layout=True
     fig.suptitle(str(date.today()))
 
@@ -70,6 +71,11 @@ def plot(diffObjects, **kwargs):
                     dat[0] = convert.twotheta2d(dat[0])
 
             ax.plot(dat[0], dat[1], label = labelname)
+        try:
+            x,y = dataObject.standard_peaks
+            ax.plot(x, y, label = "Internal standard")
+        except Exception as e:
+            LOG.debug("No internal standard plotted: {}".format(e))#do nothing
 
     if 'xlim' in kwargs:
         axs[0].set_xlim(kwargs['xlim'])
