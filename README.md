@@ -12,3 +12,7 @@ Current features:
 
 - Plotting of multiple diffractograms with possibility to zoom in on peaks
 - Specific-Peak detection for lattice constant determination (so far only Platina data added)
+
+# Dependencies
+- Dans_Diffraction
+- numpy, matplotlib, scipy, pandas
