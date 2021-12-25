@@ -4,7 +4,7 @@ from mpl_toolkits.axes_grid1.inset_locator import (
     BboxPatch, BboxConnector, BboxConnectorPatch)
 
 import numpy as np
-
+from __main__ import LOG
 
 def connect_bbox(bbox1, bbox2,
                  loc1a, loc2a, loc1b, loc2b,
