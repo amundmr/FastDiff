@@ -1,1 +1,1 @@
-from .context import fastdiff
+from .context import fdat

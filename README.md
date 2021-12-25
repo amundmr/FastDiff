@@ -1,8 +1,8 @@
-# FastDiff
+# fdat
 
-The repo needs a namechange since FastDiff is already taken at pypi. Suggestions: FastRaDat, FastDiffDat, fastdiffrac, RadAnal(Maybe not), diffdat, fdat (fast diffraction analysis tool).
+**Fast Diffraction Analysis Tool**
 
-FastDiff(ractogram) is a small software toolkit for easy visualization and lightweight analysis of diffractograms. It has been made for X-Ray diffractograms, but can ofcourse also be used for diffractograms from other radiation types like neutrons.
+fdat is a small software toolkit for easy visualization and lightweight analysis of diffractograms. It has been made for X-Ray diffractograms, but can ofcourse also be used for diffractograms from other radiation types like neutrons.
 
 # Getting started
 Install fastdiff by cloning the repository and running the setup.py
