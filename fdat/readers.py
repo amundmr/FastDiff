@@ -70,18 +70,34 @@ def read_brml(filename):
             if scantype.text == 'StillScan':
 
                 if chain.get('Description') == 'Originally measured data.':
-                    for data in chain.findall('Datum'):
+                    start = chain.findall('ScanInformation/ScaleAxes/ScaleAxisInfo/Start')[0].text
+                    stop = chain.findall('ScanInformation/ScaleAxes/ScaleAxisInfo/Stop')[0].text
+                    increment = chain.findall('ScanInformation/ScaleAxes/ScaleAxisInfo/Increment')[0].text
+                    #LOG.debug("Start: {}, Stop: {}, Increment: {}".format(start, stop, increment))
+
+                    data = np.array([float(i) for i in chain.findall('Datum')[0].text.split(",")])
+                    twoth = np.zeros(len(data))
+                    twoth[0] = start
+                    for i, elem in enumerate(twoth[1:]):
+                        twoth[i] = twoth[i-1] + increment
+
+                    print(data)
+                    print(twoth)
+                    """
+                    for data in :
                         data = data.text.split(',')
                         data = [float(i) for i in data]
+                        print(len(data))
                         twoth.append(float(data[2]))
                         intensity.append(float(data[3]))
 
                         ## THIS NEEDS TO GET START AND STOP TWOTHETA FROM THE FILE, AND THEN GET ALL THE INTENSITIES IN DATUM, AND GENERATE THE TWOTH POSITIONS FOR EACH INTENSITY
-
+                    """
             else:
                 if chain.get('Description') == 'Originally measured data.':
                     for data in chain.findall('Datum'):
                         data = data.text.split(',')
+                        print("Else: {}".format(len(data)))
                         twoth.append(float(data[2]))
                         intensity.append(float(data[3]))
 
