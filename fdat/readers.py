@@ -43,48 +43,31 @@ def read_xye(filename):
 Made by Rasmus Vester Thøgersen, NAFUMA, Dept. of Chemistry, University of Oslo 2021
 Modified by Amund Raniseth 25.12.2021
 """
-def read_brml(path, options=None):
+def read_brml(filename):
     
     import pandas as pd
     import zipfile
     import xml.etree.ElementTree as ET
+    import shutil
 
-    required_options = ['extract_folder', 'save_folder']
-    default_options = {
-        'extract_folder': 'temp',
-        'save_folder': None
-    }
-
-
-    if not options:
-        options = default_options
-
-    else:
-        for option in required_options:
-            if option not in options.keys():
-                options[option] = default_options[option]
-
-
-
-    if not os.path.isdir(options['extract_folder']):
-        os.mkdir(options['extract_folder'])
-
+    if not os.path.isdir("./temp"):
+        os.mkdir("./temp")
 
     # Extract the RawData0.xml file from the brml-file
-    with zipfile.ZipFile(path, 'r') as brml:
+    with zipfile.ZipFile(filename, 'r') as brml:
         for info in brml.infolist():
             if "RawData" in info.filename:
-                brml.extract(info.filename, options['extract_folder'])
+                brml.extract(info.filename, "./temp")
 
 
 
     # Parse the RawData0.xml file
-    path = os.path.join(options['extract_folder'], 'Experiment0/RawData0.xml')
+    path = os.path.join("./temp", 'Experiment0/RawData0.xml')
 
     tree = ET.parse(path)
     root = tree.getroot()
 
-    shutil.rmtree(options['extract_folder'])
+    shutil.rmtree("./temp")
 
     diffractogram = []
 
@@ -110,15 +93,8 @@ def read_brml(path, options=None):
                             diffractogram.append({'2th': twotheta, 'I': intensity})
 
     diffractogram = pd.DataFrame(diffractogram)
+    print(diffractogram.head)
 
-
-
-    if options['save_folder']:
-        if not os.path.isdir(options['save_folder']):
-            os.makedirs(options['save_folder'])
-
-        diffractogram.to_csv(options['save_folder'])
-
-
-
+    xye = np.zeros((len(10),3))
+    xye_t = np.transpose(xye)
     return diffractogram
