@@ -1,7 +1,7 @@
 """Main, this is ran when the user calls fastdiff."""
 
 
-from log import LOG
+from fdat.log import LOG
 
 
 def help(*args):
@@ -58,11 +58,15 @@ def init(args):
 
     def scan_path(path):
         """Scans the path inserted for supported filetypes and returns as list"""
+        
+        # Supported file formats (extensions:)
+        supp_exts = ["xye", "brml"]
 
         filepaths = []
         for (dirpath, dirnames, filenames) in os.walk(path):
             for file in filenames:
-                if file.split(".")[-1] == "xye":
+                _fn, ext = os.path.splitext(file)
+                if ext in supp_exts:
                     filepaths.append(os.path.join(dirpath, file))
                     
         filepaths.sort(key=lambda x: os.path.basename(x))
@@ -124,7 +128,7 @@ def run(args):
             LOG.debug("Debug mode active")
 
     # Initialize total data object
-    from data import Data
+    from fdat.data import Data
     data = Data(workdir,config)
     data.load_data()
 
