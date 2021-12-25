@@ -60,7 +60,7 @@ def init(args):
         """Scans the path inserted for supported filetypes and returns as list"""
         
         # Supported file formats (extensions:)
-        supp_exts = ["xye", "brml"]
+        supp_exts = [".xye", ".brml"]
 
         filepaths = []
         for (dirpath, dirnames, filenames) in os.walk(path):

@@ -6,10 +6,10 @@ from datetime import date
 from math import sqrt
 
 from numpy.lib.function_base import _diff_dispatcher
-import plot.utils as utils
-import plot.conversion as convert
-import materials
-from __main__ import LOG
+import fdat.plot.utils as utils
+import fdat.plot.conversion as convert
+import fdat.materials as materials
+from fdat.log import LOG
 
 def plot(dataObject, **kwargs):
     diffObjects = dataObject.diffs

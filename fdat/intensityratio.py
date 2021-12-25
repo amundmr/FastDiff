@@ -5,7 +5,7 @@
 from numpy import trapz
 import os
 import sys
-from __main__ import LOG
+from fdat.log import LOG
 
 def read(folder):   #This func finds all files in the input folder and puts them in a list
 

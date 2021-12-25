@@ -55,21 +55,14 @@ def read_brml(filename):
 
     # Extract the RawData0.xml file from the brml-file
     with zipfile.ZipFile(filename, 'r') as brml:
-        for info in brml.infolist():
-            if "RawData" in info.filename:
-                brml.extract(info.filename, "./temp")
+        with brml.open("Experiment0/RawData0.xml") as Rawxml:
+            tree = ET.parse(Rawxml)
 
 
-
-    # Parse the RawData0.xml file
-    path = os.path.join("./temp", 'Experiment0/RawData0.xml')
-
-    tree = ET.parse(path)
     root = tree.getroot()
 
-    shutil.rmtree("./temp")
-
-    diffractogram = []
+    twoth = []
+    intensity = []
 
     for chain in root.findall('./DataRoutes/DataRoute'):
 
@@ -80,21 +73,19 @@ def read_brml(filename):
                     for data in chain.findall('Datum'):
                         data = data.text.split(',')
                         data = [float(i) for i in data]
-                        twotheta, intensity = float(data[2]), float(data[3])
+                        twoth.append(float(data[2]))
+                        intensity.append(float(data[3]))
 
-        
+                        ## THIS NEEDS TO GET START AND STOP TWOTHETA FROM THE FILE, AND THEN GET ALL THE INTENSITIES IN DATUM, AND GENERATE THE TWOTH POSITIONS FOR EACH INTENSITY
+
             else:
                 if chain.get('Description') == 'Originally measured data.':
                     for data in chain.findall('Datum'):
                         data = data.text.split(',')
-                        twotheta, intensity = float(data[2]), float(data[3])
-                        
-                        if twotheta > 0:
-                            diffractogram.append({'2th': twotheta, 'I': intensity})
+                        twoth.append(float(data[2]))
+                        intensity.append(float(data[3]))
 
-    diffractogram = pd.DataFrame(diffractogram)
-    print(diffractogram.head)
-
-    xye = np.zeros((len(10),3))
-    xye_t = np.transpose(xye)
-    return diffractogram
+    
+    xye_t = np.array((np.array(twoth), np.array(intensity), np.zeros(len(twoth))))
+    print(xye_t)
+    return xye_t

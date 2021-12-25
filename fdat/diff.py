@@ -3,7 +3,7 @@
 import os
 import numpy as np
 import pandas as pd
-from __main__ import LOG
+from fdat.log import LOG
 import scipy
 import sys
 
@@ -41,35 +41,21 @@ class diff():
         self.wavelength = 0.68925 # TODO replace this with reader for capturing this data
 
         # Open file
-        try:
-            with open(filename, 'r') as f:
-                self.raw = f.readlines()
+        
+        from fdat.readers import read
+        self.xye_t = read(filename)
 
-            # Interpret data
-            self._create_arrays()
-            self._convert_to_Q()
-
-        except Exception as e:
-            LOG.warning("Error occurred while opening the file {}: {}".format(filename, e))
+        # Get Q-scale
+        self._convert_to_Q()
 
     def _convert_to_Q(self):
         """Converts self.xye_t to qs"""
         self.xye_t[0] = 4 * (np.pi / self.wavelength) * np.sin(self.xye_t[0]/2 * (np.pi/180)) 
 
 
-    def _create_arrays(self):
-        """Takes self.raw and creates a self.xye containing a numpy array with the data"""
-    
-        self.xye = np.zeros((len(self.raw),3)) # creates 3dim numpy array with x(2theta), y(intensity) and e(error)
-        
-        for i,line in enumerate(self.raw):
-            self.xye[i] = np.array(list(map(float, line.split())))
-
-        # Transpose array is easier to plot
-        self.xye_t = np.transpose(self.xye)
-
     def __repr__(self) -> str:
         return "diff Object: {}".format(self.name)
+
 
     def __str__(self) -> str:
         return "diff Object: {}".format(self.name)

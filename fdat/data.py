@@ -1,6 +1,6 @@
 """Contains main data class"""
 
-from __main__ import LOG
+from fdat.log import LOG
 
 
 class Data():
@@ -38,13 +38,14 @@ class Data():
         filepaths = []
         last_path_folder = os.path.basename(os.path.normpath(path))
         if last_path_folder == "data":
-            identifier = "xye"
+            identifier = [".xye", ".brml"]
         elif last_path_folder == "CIF":
-            identifier = "cif"
+            identifier = ["cif"]
 
         for (dirpath, dirnames, filenames) in os.walk(path):
             for file in filenames:
-                if file.split(".")[-1] == identifier:
+                _fn, ext = os.path.splitext(file)
+                if ext in identifier:
                     filepaths.append(os.path.join(dirpath, file))
                     
         filepaths.sort(key=lambda x: os.path.basename(x))
@@ -56,7 +57,7 @@ class Data():
         
     def load_data(self):
         import os
-        from diff import diff
+        from fdat.diff import diff
 
         for filename in self.filenames:
             self.diffs.append(diff(filename))
@@ -69,13 +70,14 @@ class Data():
                 self.cifs.append(crystal)
 
     def get_electrochemistry(self):
+        return 0
         
 
     def plot(self):
         import os
         import sys
         import toml
-        import plot
+        import fdat.plot as plot
         LOG.warning("Shit! I haven't implemented the data-class plot feature yet!")
         # Loading plot config
         try:
