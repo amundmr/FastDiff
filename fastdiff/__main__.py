@@ -95,6 +95,9 @@ def run(args):
     if config["plot"]:
         data.plot()
     
+    if config["operando"]:
+        data.get_electrochemistry()
+
     if config["convert-to-dspacing"]:
         LOG.warning("d-spacing conversion not implemented.")
 
@@ -206,6 +209,8 @@ analysis_kwargs = {
     "internal-standard" : "Pt",
     "debugging-mode": False,
     "plot": True,
+    "operando" : True,
+    "elchemfile" : "operando.mpt",
 }
 
 plot_kwargs = {

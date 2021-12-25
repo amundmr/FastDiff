@@ -49,6 +49,8 @@ class Data():
         for filename in self.filenames:
             self.diffs.append(diff(os.path.join(self.workdir, "data", filename)))
 
+    def get_electrochemistry(self):
+        
 
     def plot(self):
         import os

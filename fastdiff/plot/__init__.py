@@ -81,5 +81,5 @@ def plot(diffObjects, **kwargs):
 
     axs[0].legend()
     LOG.debug("Showing plot")
-    plt.show()
+    fig.show()
     plt.savefig("PLOT.png")
