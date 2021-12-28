@@ -13,9 +13,10 @@ def read(filename):
     _fn, ext = os.path.splitext(filename)
     if ext == ".xye":
         xye_t = read_xye(filename)
+        datetime_object = None
     elif ext == ".brml":
-        xye_t = read_brml(filename)
-    return xye_t
+        xye_t, datetime_object = read_brml(filename)
+    return xye_t, datetime_object
         
 
 def read_xye(filename):
@@ -64,6 +65,10 @@ def read_brml(filename):
     twoth = []
     intensity = []
 
+    datetime_text = root.findall('./TimeStampStarted')[0].text
+    import dateutil.parser
+    datetime_object = dateutil.parser.isoparse(datetime_text)
+
     for chain in root.findall('./DataRoutes/DataRoute'):
 
         for scantype in chain.findall('ScanInformation/ScanMode'):
@@ -71,19 +76,27 @@ def read_brml(filename):
 
                 if chain.get('Description') == 'Originally measured data.':
                     start = chain.findall('ScanInformation/ScaleAxes/ScaleAxisInfo/Start')[0].text
-                    stop = chain.findall('ScanInformation/ScaleAxes/ScaleAxisInfo/Stop')[0].text
-                    increment = chain.findall('ScanInformation/ScaleAxes/ScaleAxisInfo/Increment')[0].text
+                    #stop = chain.findall('ScanInformation/ScaleAxes/ScaleAxisInfo/Stop')[0].text
+                    increment = float(chain.findall('ScanInformation/ScaleAxes/ScaleAxisInfo/Increment')[0].text)
                     #LOG.debug("Start: {}, Stop: {}, Increment: {}".format(start, stop, increment))
 
                     data = np.array([float(i) for i in chain.findall('Datum')[0].text.split(",")])
+                    # Remove all non-intensity values
+                    diff = np.append(np.diff(data),0)
+                    data = data[diff != 0]
+                    #print(data)
+
                     twoth = np.zeros(len(data))
                     twoth[0] = start
-                    for i, elem in enumerate(twoth[1:]):
-                        twoth[i] = twoth[i-1] + increment
-
+                    for i, elem in enumerate(twoth[:-1]):
+                        twoth[i+1] = twoth[i] + increment
+                    
+                    #print(twoth)
+                    #import sys
+                    #sys.exit()
+                    """
                     print(data)
                     print(twoth)
-                    """
                     for data in :
                         data = data.text.split(',')
                         data = [float(i) for i in data]
@@ -102,6 +115,6 @@ def read_brml(filename):
                         intensity.append(float(data[3]))
 
     
-    xye_t = np.array((np.array(twoth), np.array(intensity), np.zeros(len(twoth))))
-    print(xye_t)
-    return xye_t
+    xye_t = np.array((np.array(twoth), np.array(data), np.zeros(len(twoth))))
+    #print(xye_t)
+    return xye_t, datetime_object

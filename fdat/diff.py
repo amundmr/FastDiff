@@ -43,7 +43,7 @@ class diff():
         # Open file
         
         from fdat.readers import read
-        self.xye_t = read(filename)
+        self.xye_t, self.datetime = read(filename)
 
         # Get Q-scale
         self._convert_to_Q()

@@ -134,11 +134,16 @@ def run(args):
 
     # Act on configuration
 
-    if config["plot"]:
+    if config["plot"] and not config["operando"]:
+        LOG.debug("Running data.plot()")
         data.plot()
     
     if config["operando"]:
+        LOG.debug("Running data.get_electrochemistry()")
         data.get_electrochemistry()
+        LOG.debug("Running data.plot_operando()")
+        data.plot_operando()
+        
 
     if config["convert-to-dspacing"]:
         LOG.warning("d-spacing conversion not implemented.")
@@ -153,9 +158,6 @@ def run(args):
     if type(config["internal-standard"]) is str:
         LOG.warning("Internal standard in itself not implemented.")
 
-    if config["plot"]:
-        LOG.debug("Running data.plot()")
-        data.plot()
 
 
 def load_config(args):

@@ -1,5 +1,6 @@
 """Contains main data class"""
 
+from xml.etree.ElementTree import XML
 from fdat.log import LOG
 
 
@@ -93,6 +94,74 @@ class Data():
         #    plot.plot(self.diffs)
         #sys.exit()
 
+    def plot_operando(self):
+        import os
+        import toml
+        import sys
+        # Loading plot config
+        try:
+            with open(os.path.join(self.workdir, "plot.toml")) as f:
+                self.plotcfg = toml.load(f,)
+        except Exception as e:
+            LOG.error("Could not read 'plot.toml'! Error message: {}".format(e))
+            sys.exit()
+
+        import matplotlib.pyplot as plt
+        import matplotlib.cm as cm
+        import numpy as np
+
+        """ ## Using imshow
+        xye_t_lst = [x.xye_t[1] for x in self.diffs]
+        numfail = 0
+        for i,dat in enumerate(xye_t_lst):
+            if len(dat) != len(xye_t_lst[0]):
+                xye_t_lst[i] = xye_t_lst[i-1]
+                numfail += 1
+
+        LOG.critical("Number of failed patterns: {}".format(numfail))
+
+        x = np.vstack(xye_t_lst)
+        qrange_start = self.diffs[0].xye_t[0][0]
+        qrange_end = self.diffs[0].xye_t[0][-1]
+        time_start = 0 
+        time_end =  divmod((self.diffs[-1].datetime - self.diffs[0].datetime).total_seconds(), 3600)[0] 
+
+
+        fig, ax = plt.subplots()
+        im = ax.imshow( x, 
+                        #interpolation='bilinear',
+                        aspect = 'auto', 
+                        cmap=cm.RdYlGn,
+                        origin='lower', 
+                        extent=[qrange_start, qrange_end, time_start, time_end],
+                        #vmax=abs(x).max(), 
+                        #vmin=-abs(x).max()
+                        )
+        cf = ax.contourf(X, Y, Z, 10, cmap=plt.cm.bone, origin='lower')
+
+        """
+
+        """## Using plot
+        fig, ax = plt.subplots()
+        max_intensity = 0
+        for diff in self.diffs:
+            if max(diff.xye_t[1]) > max_intensity:
+                max_intensity = max(diff.xye_t[1])
+
+        data = []
+        for diff in self.diffs:
+            rel_time = divmod((diff.datetime - self.diffs[0].datetime).total_seconds(), 3600)[0]
+            xyi = np.array([diff.xye_t[0], np.array([rel_time] * len(diff.xye_t[0])), diff.xye_t[1]/max_intensity])
+            ax.scatter(xyi[0], xyi[1], c= xyi[2])"""
+
+        ## Using countourf
+        fig, ax = plt.subplots()
+
+        ax.set(
+            ylabel = 'Experiment time [hours]',
+            xlabel = r'Q-range [Å$^{⁻1}$]'
+        )
+        plt.show()
 
     def calc_temps(self):
 
