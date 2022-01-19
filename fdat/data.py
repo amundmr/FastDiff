@@ -71,7 +71,20 @@ class Data():
                 self.cifs.append(crystal)
 
     def get_electrochemistry(self):
-        return 0
+        import os
+        if os.path.isfile(self.cfg["elchemfile"]):
+            fn = self.cfg["elchemfile"]
+            import ecdh
+            self.elchemdata = ecdh.get_raw(fn, specific_cycles=[1,2])
+            self.elchemdata['time/h'] = self.elchemdata['time/s'].div(3600)
+        else:
+            fn = self.cfg["elchemfile"]
+            LOG.error(f"Can't find the file '{fn}'")
+            import pandas as pd
+            self.elchemdata = pd.DataFrame()
+            return None
+
+        
         
 
     def plot(self):
@@ -126,8 +139,17 @@ class Data():
         time_start = 0 
         time_end =  divmod((self.diffs[-1].datetime - self.diffs[0].datetime).total_seconds(), 3600)[0] 
 
-
-        fig, ax = plt.subplots()
+        self.get_electrochemistry()
+        if not self.elchemdata.empty:
+            fig, (ax, ax2) = plt.subplots(1,2, sharey=True, gridspec_kw={'width_ratios': [2, 1]})
+            ax2.plot(self.elchemdata["Ewe/V"], self.elchemdata["time/h"])
+            ax2.set(
+                xlabel = "Potential [V]",
+                xlim = (  3.5, 4.9 ),
+            )
+            ax2.tick_params(direction='in', top = 'true', right = 'true')
+        else:
+            fig, ax = plt.subplots()
         im = ax.imshow( x, 
                         #interpolation='bilinear',
                         aspect = 'auto', 
@@ -141,6 +163,7 @@ class Data():
             ylabel = 'Experiment time [hours]',
             xlabel = r'Q-range [Å$^{⁻1}$]'
         )
+        ax.tick_params(direction='in', top = 'true', right = 'true')
 
 
         plt.show()
