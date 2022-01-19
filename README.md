@@ -16,3 +16,8 @@ Current features:
 # Dependencies
 - Dans_Diffraction
 - numpy, matplotlib, scipy, pandas
+
+# UML Chart
+
+![](docs/fdat_UML_diagram.svg)
+
