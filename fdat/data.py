@@ -110,7 +110,7 @@ class Data():
         import matplotlib.cm as cm
         import numpy as np
 
-        """ ## Using imshow
+        ## Using imshow
         xye_t_lst = [x.xye_t[1] for x in self.diffs]
         numfail = 0
         for i,dat in enumerate(xye_t_lst):
@@ -137,30 +137,12 @@ class Data():
                         #vmax=abs(x).max(), 
                         #vmin=-abs(x).max()
                         )
-        cf = ax.contourf(X, Y, Z, 10, cmap=plt.cm.bone, origin='lower')
-
-        """
-
-        """## Using plot
-        fig, ax = plt.subplots()
-        max_intensity = 0
-        for diff in self.diffs:
-            if max(diff.xye_t[1]) > max_intensity:
-                max_intensity = max(diff.xye_t[1])
-
-        data = []
-        for diff in self.diffs:
-            rel_time = divmod((diff.datetime - self.diffs[0].datetime).total_seconds(), 3600)[0]
-            xyi = np.array([diff.xye_t[0], np.array([rel_time] * len(diff.xye_t[0])), diff.xye_t[1]/max_intensity])
-            ax.scatter(xyi[0], xyi[1], c= xyi[2])"""
-
-        ## Using countourf
-        fig, ax = plt.subplots()
-
         ax.set(
             ylabel = 'Experiment time [hours]',
             xlabel = r'Q-range [Å$^{⁻1}$]'
         )
+
+
         plt.show()
 
     def calc_temps(self):
