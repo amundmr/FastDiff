@@ -148,6 +148,7 @@ class Data():
                 xlim = (  3.5, 4.9 ),
             )
             ax2.tick_params(direction='in', top = 'true', right = 'true')
+            
         else:
             fig, ax = plt.subplots()
         im = ax.imshow( x, 
@@ -165,7 +166,7 @@ class Data():
         )
         ax.tick_params(direction='in', top = 'true', right = 'true')
 
-
+        plt.subplots_adjust(wspace=0.05, hspace=0)
         plt.show()
 
     def calc_temps(self):
